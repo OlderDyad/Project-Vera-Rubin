@@ -9,3 +9,11 @@ outputs/
 # Large CSVs
 seeds/*.csv
 !seeds/quasar_seeds.csv  # Keep the small anchor lists
+
+# Experimental / High-Volume Architecture
+step*.py
+calibrate_*.py
+rank_*.py
+investigate_*.py
+status_check.py
+check_simbad.py
