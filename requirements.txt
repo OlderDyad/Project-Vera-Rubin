@@ -1,0 +1,26 @@
+# Vera Rubin / LSST Alert Discovery Toolkit
+# Install with: pip install -r requirements.txt
+
+# Alert packet parsing
+fastavro>=1.9.0
+lsst-alert-packet>=0.3.0
+
+# Astronomy
+astropy>=6.0.0
+astroquery>=0.4.7
+
+# Data handling
+pandas>=2.0.0
+numpy>=1.26.0
+requests>=2.31.0
+
+# Machine learning
+scikit-learn>=1.4.0
+
+# Visualization
+matplotlib>=3.8.0
+plotly>=5.20.0
+
+# Jupyter (optional but recommended)
+jupyter>=1.0.0
+ipykernel>=6.29.0

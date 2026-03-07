@@ -1,0 +1,11 @@
+# Local Data & Environments
+venv/
+.env
+data/
+outputs/
+*.gz
+*.parquet
+
+# Large CSVs
+seeds/*.csv
+!seeds/quasar_seeds.csv  # Keep the small anchor lists
