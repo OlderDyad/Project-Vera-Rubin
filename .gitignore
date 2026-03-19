@@ -1,19 +1,23 @@
-# Local Data & Environments
+# --- Project Vera Rubin: Global Ignores ---
 venv/
+.venv/
+__pycache__/
 .env
+*.pyc
+
+# --- Large Scale Data (E: Drive Protection) ---
 data/
-outputs/
+seeds/
 *.gz
 *.parquet
+*.fits
+*.vot
 
-# Large CSVs
-seeds/*.csv
-!seeds/quasar_seeds.csv  # Keep the small anchor lists
-
-# Experimental / High-Volume Architecture
-step*.py
-calibrate_*.py
-rank_*.py
-investigate_*.py
-status_check.py
-check_simbad.py
+# --- Output Management ---
+outputs/* # Ignore all subfolders in outputs
+!outputs/reports/        # UN-IGNORE the reports folder
+!outputs/reports/*.pdf   # Specifically allow your portfolios
+!outputs/hunter/         # UN-IGNORE the hunter folder
+outputs/hunter/cutouts/  # But STILL IGNORE the thousands of JPGs
+outputs/hunter/plots/    # STILL IGNORE diagnostic plots
+!outputs/hunter/*.csv    # KEEP the final candidate CSVs
