@@ -1,23 +1,64 @@
-# --- Project Vera Rubin: Global Ignores ---
-venv/
+# ── Virtual environments ──────────────────────────────────────────
 .venv/
+.venv64/
+venv/
+env/
 __pycache__/
-.env
 *.pyc
+*.pyo
 
-# --- Large Scale Data (E: Drive Protection) ---
+# ── Debug and scratch scripts ─────────────────────────────────────
+debug_*.py
+check_*.py
+deep_scan_*.py
+diagnose_*.py
+sweep_*.py
+target_*.py
+test_filter.py
+test_antares_filter.py
+hidden_gems.py
+make_dense_seeds.py
+watchdog.py
+
+# ── Intermediate outputs ──────────────────────────────────────────
+outputs/hunter/
+outputs/reports/
+outputs/calibration/
+outputs/plots/
+outputs/investigation/
+
+# Keep these outputs (validated results)
+!outputs/survey_v3/
+!outputs/diagnostic/
+
+# ── Data files ────────────────────────────────────────────────────
 data/
-seeds/
-*.gz
-*.parquet
-*.fits
-*.vot
+*.csv.bak
+*.db-journal
+*.db-wal
+*.db-shm
 
-# --- Output Management ---
-outputs/* # Ignore all subfolders in outputs
-!outputs/reports/        # UN-IGNORE the reports folder
-!outputs/reports/*.pdf   # Specifically allow your portfolios
-!outputs/hunter/         # UN-IGNORE the hunter folder
-outputs/hunter/cutouts/  # But STILL IGNORE the thousands of JPGs
-outputs/hunter/plots/    # STILL IGNORE diagnostic plots
-!outputs/hunter/*.csv    # KEEP the final candidate CSVs
+# ── Documents (use outputs/ for reports) ─────────────────────────
+*.docx
+~$*.docx
+*.pdf
+~$*.pdf
+
+# ── IDE and OS files ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Jupyter ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Credentials and tokens ────────────────────────────────────────
+*.token
+*.key
+.env
+secrets.py
