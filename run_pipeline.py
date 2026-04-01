@@ -28,8 +28,35 @@ from pathlib import Path
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 DB_PATH      = Path("outputs/survey_v3/survey_results.db")
-SURVEY_SEEDS = "seeds/castles_wide_seeds.csv"
 SURVEY_WORKERS = 4
+
+# ── Run modes ─────────────────────────────────────────────────────────────────
+# Each mode sets seeds, survey settings, and resume behavior automatically.
+# Override with --seeds, --workers, --resume if needed.
+
+RUN_MODES = {
+    "ztf": {
+        "label":   "ZTF Maintenance — wide-separation CASTLES targets",
+        "seeds":   "seeds/castles_wide_seeds.csv",
+        "resume":  True,    # skip already-processed seeds
+        "note":    "Weekly run. ZTF settings. Known-lens validation.",
+    },
+    "rubin": {
+        "label":   "Rubin Compact — sub-arcsecond galaxy lenses",
+        "seeds":   "seeds/compact_lenses.csv",
+        "resume":  False,   # always re-query Rubin TAP for fresh photometry
+        "note":    "Run when RSP alerts resume. Rubin settings.",
+    },
+    "full": {
+        "label":   "Full Survey — all known lenses under Rubin settings",
+        "seeds":   "seeds/all_lenses.csv",
+        "resume":  False,
+        "note":    "Comprehensive run. Requires Rubin settings active.",
+    },
+}
+
+DEFAULT_MODE = "ztf"
+SURVEY_SEEDS = RUN_MODES[DEFAULT_MODE]["seeds"]
 
 MODULES = {
     "survey":     "rubin_survey_v3.py",
@@ -269,13 +296,39 @@ def print_consolidated_summary(before, after, results):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Project Vera Rubin — Master Pipeline Runner")
-    parser.add_argument("--seeds",         default=SURVEY_SEEDS)
+        description="Project Vera Rubin — Master Pipeline Runner",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Run modes (--mode):
+  ztf    Weekly ZTF maintenance. Wide CASTLES targets. --resume on.
+         python run_pipeline.py --mode ztf
+  rubin  Rubin compact lenses. Sub-arcsecond galaxy lenses.
+         python run_pipeline.py --mode rubin
+  full   All known lenses. Requires all_lenses.csv seed file.
+         python run_pipeline.py --mode full
+
+Override any mode setting with explicit flags:
+  python run_pipeline.py --mode rubin --workers 8
+  python run_pipeline.py --mode ztf --seeds seeds/custom.csv
+        """)
+    parser.add_argument("--mode",          default=DEFAULT_MODE,
+                        choices=list(RUN_MODES.keys()),
+                        help="Run mode: ztf / rubin / full (default: ztf)")
+    parser.add_argument("--seeds",         default=None,
+                        help="Override seed file for this mode")
     parser.add_argument("--workers",       type=int, default=SURVEY_WORKERS)
     parser.add_argument("--survey-only",   action="store_true")
     parser.add_argument("--analysis-only", action="store_true")
-    parser.add_argument("--resume",        action="store_true")
+    parser.add_argument("--resume",        default=None, action="store_true",
+                        help="Override resume setting for this mode")
     args = parser.parse_args()
+
+    # Apply mode defaults, then override with explicit flags
+    mode = RUN_MODES[args.mode]
+    if args.seeds is None:
+        args.seeds = mode["seeds"]
+    if args.resume is None:
+        args.resume = mode["resume"]
 
     header("PROJECT VERA RUBIN — GRAVITATIONAL LENS DISCOVERY PIPELINE")
     print()
@@ -283,6 +336,11 @@ def main():
     print("  Repo:      https://github.com/OlderDyad/Project-Vera-Rubin")
     print(f"  Time:      "
           f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
+    print()
+    print(f"  MODE:      {args.mode.upper()} — {mode['label']}")
+    print(f"  Seeds:     {args.seeds}")
+    print(f"  Resume:    {args.resume}  |  Workers: {args.workers}")
+    print(f"  Note:      {mode['note']}")
 
     # Prerequisites
     if not check_prerequisites():
