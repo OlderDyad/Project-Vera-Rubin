@@ -36,6 +36,7 @@ MODULES = {
     "h0":         "h0_pipeline.py",
     "anisotropy": "anisotropy_monitor.py",
     "mstep":      "mstep_comparison.py",
+    "candidates": "candidate_manager.py",
 }
 
 # ── Utilities ──────────────────────────────────────────────────────────────────
@@ -226,9 +227,9 @@ def print_consolidated_summary(before, after, results):
     print()
     print("  PENDING EXTERNAL ITEMS:")
     pending = [
-        ("RSP account",    "Rubin Science Platform — Heather, SLAC"),
         ("ANTARES MR !1",  "Broker filter — awaiting team review"),
         ("Rubin alerts",   "Week 21 engineering tests — weeks away"),
+        ("New discovery",  "First unknown system from pipeline"),
     ]
     for item, note in pending:
         print(f"    ⧖ {item:<18} {note}")
@@ -309,6 +310,10 @@ def main():
             MODULES["mstep"], label="Mstep Scenario Comparison")
     else:
         ok("Mstep comparison skipped (--survey-only)")
+
+    # ── Module 5: Candidate Manager ──────────────────────────────────────────
+    results["Candidate manager"] = run_module(
+        MODULES["candidates"], [], label="Candidate Manager")
 
     # DB snapshot after
     after = db_snapshot()
