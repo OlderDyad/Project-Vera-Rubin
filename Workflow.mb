@@ -1,0 +1,72 @@
+cd E:\Downloads\rubin_discovery_toolkit\rubin_discovery
+.venv64\Scripts\Activate.ps1
+
+One script to rule them all:
+python run_pipeline.py --seeds seeds/castles_wide_seeds.csv --workers 4
+
+PHASE 1 — Rubin DP0.2 (Simulated Data, RSP account arrives)
+One-time setup:
+powershell# Save your RSP token
+echo "your-token-here" > ~/.rsp-tap.token
+
+# Test connection
+python rubin_tap_adapter.py
+
+# Switch to Rubin settings — edit rubin_survey_v3.py SETTINGS:
+# Change SETTINGS = SETTINGS_ZTF  →  SETTINGS = SETTINGS_RUBIN
+# (from rubin_settings_patch.py)
+Run against compact lens catalog:
+powershell# Build compact lens seed file from rubin_settings_patch.py
+python -c "
+import pandas as pd
+from rubin_settings_patch import COMPACT_LENS_CATALOG
+rows = [{'name': k, 'ra': v[0], 'dec': v[1]} 
+        for k, v in COMPACT_LENS_CATALOG.items()]
+pd.DataFrame(rows).to_csv('seeds/compact_lenses.csv', index=False)
+print('Seeds written')
+"
+
+# Run on compact lenses — now min_sep=0.1 opens HE0435, RXJ1131, B1608...
+python rubin_survey_v3.py --seeds seeds/compact_lenses.csv --workers 4
+python mstep_comparison.py
+
+The timeline from here:
+The RSP approval and ANTARES merge are both days-to-weeks away. When they arrive, everything flips from "waiting" to "running." The pipeline doesn't need more work — it needs data.
+One thing worth doing while you wait: Update the phase1_technical_note_v2.docx with the RNAAS citation and the DOI once it arrives from IOP. That document is your living record of the project — it should reflect the published paper, the H0 pipeline, and the anisotropy monitor. When Rubin detections start coming in, you'll want a clean record of what the baseline was.
+
+
+
+
+
+
+
+When your lens_hunter.py finishes, run these in order:
+
+python .\rank_goldilocks.py
+
+python .\check_simbad.py
+
+python .\validate_gaia.py
+
+python .\mass_modeler.py
+
+python .\analyze_colors.py
+
+python .\generate_reports.py
+
+
+
+Final "Army of One" Workflow Order:
+rank_goldilocks.py (Filter)
+
+check_simbad.py (Novelty)
+
+validate_gaia.py (Astrometry)
+
+mass_modeler.py (Physics)
+
+analyze_colors.py (Photometry)
+
+generate_reports.py (Publish)
+
+

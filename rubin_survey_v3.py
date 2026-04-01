@@ -39,11 +39,11 @@ SETTINGS = {
     "min_score":   0.28,
     "min_rungs":   2,
     "radius":      60.0,
-    "min_sep":     0.5,
+    "min_sep":     0.1,
     "pair_sep":    50.0,
-    "min_det":     30,
-    "lag_range":   (-900, 900),
-    "zdcf_bin":     5.0,          # 5-day bins: diagnostic validated
+    "min_det":     20,
+    "lag_range":   (-1500, 1500),
+    "zdcf_bin":     2.0,          # 5-day bins: diagnostic validated
     "timeout":     20,
     "max_obj":     8,
 }
