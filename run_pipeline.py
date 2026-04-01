@@ -37,6 +37,7 @@ MODULES = {
     "anisotropy": "anisotropy_monitor.py",
     "mstep":      "mstep_comparison.py",
     "candidates": "candidate_manager.py",
+    "rung7":      "rung7_crossmatch.py",
 }
 
 # ── Utilities ──────────────────────────────────────────────────────────────────
@@ -221,6 +222,24 @@ def print_consolidated_summary(before, after, results):
         except Exception:
             pass
 
+        # Discovery candidates from Rung 7
+        try:
+            cat = sqlite3.connect("outputs/candidate_catalog.db")
+            disc = cat.execute(
+                "SELECT pair_id, anchor, score FROM candidate_catalog "
+                "WHERE is_new_system=1 ORDER BY score DESC"
+            ).fetchall()
+            cat.close()
+            print()
+            if disc:
+                print("  ★★★ DISCOVERY CANDIDATES ★★★")
+                for pid, anchor, score in disc:
+                    print(f"    ★ {anchor:<20} score={score:.3f}  {pid[:35]}")
+            else:
+                print("  Discovery candidates: 0 (awaiting Rubin alerts)")
+        except Exception:
+            pass
+
         conn.close()
 
     # Pending
@@ -314,6 +333,13 @@ def main():
     # ── Module 5: Candidate Manager ──────────────────────────────────────────
     results["Candidate manager"] = run_module(
         MODULES["candidates"], [], label="Candidate Manager")
+
+    # ── Module 6: Rung 7 Cross-Catalog Verification ───────────────────────────
+    if run_survey:
+        results["Rung 7 cross-match"] = run_module(
+            MODULES["rung7"], label="Rung 7 Cross-Catalog Verification")
+    else:
+        ok("Rung 7 skipped (--analysis-only)")
 
     # DB snapshot after
     after = db_snapshot()
