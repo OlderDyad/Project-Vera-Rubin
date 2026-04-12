@@ -274,7 +274,7 @@ def print_consolidated_summary(before, after, results):
     print("  PENDING EXTERNAL ITEMS:")
     pending = [
         ("ANTARES MR !1",  "Broker filter — awaiting team review"),
-        ("Rubin alerts",   "Week 21 engineering tests — weeks away"),
+        ("Rubin alerts",   "COSMOS DDF generating alerts — more fields coming"),
         ("New discovery",  "First unknown system from pipeline"),
     ]
     for item, note in pending:
@@ -356,14 +356,36 @@ Override any mode setting with explicit flags:
 
     # ── Module 1: Discovery Survey ───────────────────────────────────────────
     if run_survey:
-        survey_args = [
-            "--seeds",   args.seeds,
-            "--workers", str(args.workers),
-        ]
-        if args.resume:
-            survey_args.append("--resume")
-        results["Survey (rubin_survey_v3)"] = run_module(
-            MODULES["survey"], survey_args, "ZDCF Discovery Survey")
+        if args.mode == "full":
+            # Full mode: two phases with different settings
+            # Phase 1: wide-separation lenses with ZTF settings
+            section("FULL MODE: PHASE 1 — ZTF WIDE LENSES")
+            r1 = run_module(MODULES["survey"],
+                ["--seeds",    "seeds/castles_wide_seeds.csv",
+                 "--workers",  str(args.workers),
+                 "--settings", "ztf",
+                 "--resume"],
+                label="Survey Phase 1: ZTF wide lenses")
+
+            # Phase 2: compact lenses with Rubin settings
+            section("FULL MODE: PHASE 2 — RUBIN COMPACT LENSES")
+            r2 = run_module(MODULES["survey"],
+                ["--seeds",    "seeds/compact_lenses.csv",
+                 "--workers",  str(args.workers),
+                 "--settings", "rubin"],
+                label="Survey Phase 2: Rubin compact lenses")
+
+            results["Survey (rubin_survey_v3)"] = r1 and r2
+        else:
+            # Standard single-phase run
+            survey_args = [
+                "--seeds",   args.seeds,
+                "--workers", str(args.workers),
+            ]
+            if args.resume:
+                survey_args.append("--resume")
+            results["Survey (rubin_survey_v3)"] = run_module(
+                MODULES["survey"], survey_args, label="ZDCF Discovery Survey")
     else:
         ok("Survey skipped (--analysis-only)")
 
