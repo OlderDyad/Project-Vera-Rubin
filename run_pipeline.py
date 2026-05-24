@@ -45,6 +45,7 @@ RUN_MODES = {
         "label":   "Rubin Compact — sub-arcsecond galaxy lenses",
         "seeds":   "seeds/compact_lenses.csv",
         "resume":  False,   # always re-query Rubin TAP for fresh photometry
+        "settings": "rubin",
         "note":    "Run when RSP alerts resume. Rubin settings.",
     },
     "full": {
@@ -379,13 +380,15 @@ Override any mode setting with explicit flags:
         else:
             # Standard single-phase run
             survey_args = [
-                "--seeds",   args.seeds,
-                "--workers", str(args.workers),
+                "--seeds",    args.seeds,
+                "--workers",  str(args.workers),
+                "--settings", mode.get("settings", "ztf"),
             ]
             if args.resume:
                 survey_args.append("--resume")
             results["Survey (rubin_survey_v3)"] = run_module(
                 MODULES["survey"], survey_args, label="ZDCF Discovery Survey")
+            
     else:
         ok("Survey skipped (--analysis-only)")
 
